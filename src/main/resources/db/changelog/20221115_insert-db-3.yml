@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20221115_insert-db-3
+      author: carolina.sarateanu
+      failOnError: true
+      changes:
+        - sql:
+            sql: INSERT into db3.human(id, name, age)
+              VALUES (1, "Ion", "34")
+        - sql:
+            sql:  INSERT into db3.human(id, name, age)
+              VALUES (2, "Bob", "20");

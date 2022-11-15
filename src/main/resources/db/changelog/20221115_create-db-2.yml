@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20221115_create-db-2
+      author: carolina.sarateanu
+      failOnError: true
+      changes:
+        - sql:
+            sql: CREATE TABLE human (
+              id UUID PRIMARY KEY,
+              name VARCHAR(50) NOT NULL,
+              age INTEGER NOT NULL
+              );

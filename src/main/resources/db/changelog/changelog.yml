@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - include:
+      - file: 20221115_create-db-connector.yml
+      - relativeToChangelogFile: true
+  - include:
+      - file: 20221115_create-db-1.yml
+      - relativeToChangelogFile: true
+  - include:
+      - file: 20221115_create-db-2.yml
+      - relativeToChangelogFile: true
+  - include:
+      - file: 20221115_create-db-3.yml
+      - relativeToChangelogFile: true
+  - include:
+      - file: 20221115_insert-db-connections.yml
+      - relativeToChangelogFile: true
+  - include:
+      - file: 20221115_insert-db-1.yml
+      - relativeToChangelogFile: true
+  - include:
+      - file: 20221115_insert-db-2.yml
+      - relativeToChangelogFile: true
+  - include:
+      - file: 20221115_insert-db-3.yml
+      - relativeToChangelogFile: true
