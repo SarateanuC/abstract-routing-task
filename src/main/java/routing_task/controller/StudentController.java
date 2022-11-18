@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import routing_task.config.DataSource;
 import routing_task.contextHolder.DataSourceContextHolder;
 import routing_task.model.dto.StudentResponseDto;
-import routing_task.service.DataSourceService;
 import routing_task.service.StudentService;
 
 import java.util.List;
@@ -25,16 +23,13 @@ public class StudentController {
 
     @GetMapping(value = "/all/{dataSourceType}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<StudentResponseDto> getAllEmployeeDetails(@PathVariable("dataSourceType") String dataSourceType) {
-        if (DATASOURCE_ONE.toString().equals(dataSourceType)) {
-            dataSourceContextHolder.setBranchContext(DATASOURCE_ONE);
-        }
         if (DATASOURCE_TWO.toString().equals(dataSourceType)) {
             dataSourceContextHolder.setBranchContext(DATASOURCE_TWO);
         }
         if (DATASOURCE_THREE.toString().equals(dataSourceType)) {
             dataSourceContextHolder.setBranchContext(DATASOURCE_THREE);
         }
-        dataSourceContextHolder.setBranchContext(PRIMARY_DATASOURCE);
+        dataSourceContextHolder.setBranchContext(DATASOURCE_ONE);
         return studentService.selectAll();
     }
 }
