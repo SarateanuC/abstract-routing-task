@@ -1,15 +1,11 @@
-package routing_task.contextHolder;
+package routing_task.config;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import routing_task.context.DataSourceEnum;
-
-import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_SINGLETON;
+import routing_task.config.enums.DataSourceEnum;
 
 @Component
-@Scope(value = SCOPE_SINGLETON)
 public class DataSourceContextHolder {
-    private static ThreadLocal<DataSourceEnum> threadLocal;
+    private final ThreadLocal<DataSourceEnum> threadLocal;
 
     public DataSourceContextHolder() {
         threadLocal = new ThreadLocal<>();
@@ -23,7 +19,7 @@ public class DataSourceContextHolder {
         return threadLocal.get();
     }
 
-    public static void clearBranchContext() {
+    public void clearBranchContext() {
         threadLocal.remove();
     }
 }

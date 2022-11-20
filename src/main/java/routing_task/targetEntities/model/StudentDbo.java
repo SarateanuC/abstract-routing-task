@@ -1,11 +1,10 @@
-package routing_task.model.dbo;
+package routing_task.targetEntities.model;
 
 import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -16,7 +15,7 @@ import java.util.UUID;
 public class StudentDbo {
     @Id
     @GeneratedValue
-    private UUID id;
+    private Integer id;
     private String name;
     private Integer age;
 }

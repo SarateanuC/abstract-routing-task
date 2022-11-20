@@ -1,18 +1,13 @@
 package routing_task.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import routing_task.contextHolder.DataSourceContextHolder;
-import routing_task.model.dto.StudentResponseDto;
-import routing_task.service.StudentService;
-
-import java.util.List;
-
-import static routing_task.context.DataSourceEnum.*;
+import routing_task.config.DataSourceContextHolder;
+import routing_task.config.enums.DataSourceEnum;
+import routing_task.targetEntities.service.StudentService;
 
 @RestController
 @RequestMapping("/api/student")
@@ -21,15 +16,11 @@ public class StudentController {
     private final StudentService studentService;
     private final DataSourceContextHolder dataSourceContextHolder;
 
-    @GetMapping(value = "/all/{dataSourceType}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<StudentResponseDto> getAllEmployeeDetails(@PathVariable("dataSourceType") String dataSourceType) {
-        if (DATASOURCE_TWO.toString().equals(dataSourceType)) {
-            dataSourceContextHolder.setBranchContext(DATASOURCE_TWO);
-        }
-        if (DATASOURCE_THREE.toString().equals(dataSourceType)) {
-            dataSourceContextHolder.setBranchContext(DATASOURCE_THREE);
-        }
-        dataSourceContextHolder.setBranchContext(DATASOURCE_ONE);
-        return studentService.selectAll();
+    @GetMapping(value = "/test")
+    public String getDb(@RequestParam("dataSourceType") DataSourceEnum dataSourceType) {
+        dataSourceContextHolder.setBranchContext(dataSourceType);
+        studentService.save();
+        dataSourceContextHolder.clearBranchContext();
+        return "Applied db " + dataSourceType;
     }
 }
