@@ -2,8 +2,11 @@ package routing_task.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,15 +27,27 @@ import java.util.Map;
 @EnableJpaRepositories(basePackages = "routing_task.main",
         transactionManagerRef = "primaryTransactionManager",
         entityManagerFactoryRef = "primaryEntityManager")
+@RequiredArgsConstructor
 public class DataSourceConfigInit {
-
+    @Value("${datasource.primary.driver-class-name}")
+    private String driver;
+    @Value("${datasource.primary.url}")
+    private String url;
+    @Value("${datasource.primary.username}")
+    private String username;
+    @Value("${datasource.primary.password}")
+    private String password;
+    @Value("${datasource.primary.database-name:settings}")
+    private String databaseName;
     @Bean("primaryDatabase")
     @Primary
-    public DataSource dataSourceMain(PrimaryDataSource primaryDataSource) {
+    @SneakyThrows
+    public DataSource dataSourceMain() {
+
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setUsername(primaryDataSource.getUsername());
-        hikariConfig.setPassword(primaryDataSource.getPassword());
-        hikariConfig.setJdbcUrl(primaryDataSource.getUrl());
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
+        hikariConfig.setJdbcUrl(url);
         return new HikariDataSource(hikariConfig);
     }
 
@@ -42,7 +57,7 @@ public class DataSourceConfigInit {
             EntityManagerFactoryBuilder builder,
             @Qualifier("primaryDatabase") DataSource primaryDataSource) {
         Map<String, String> primaryJpaProperties = new HashMap<>();
-        primaryJpaProperties.put("hibernate.fialect", "org.hibernate.dialect.PostgreSQLDialect");
+        primaryJpaProperties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         primaryJpaProperties.put("hibernate.hbm2ddl.auto", "update");
         return builder.dataSource(primaryDataSource)
                 .packages("routing_task.main")
