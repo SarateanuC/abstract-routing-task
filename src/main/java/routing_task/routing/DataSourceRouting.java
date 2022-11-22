@@ -1,31 +1,56 @@
 package routing_task.routing;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.SneakyThrows;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.stereotype.Component;
-import routing_task.contextHolder.DataSourceContextHolder;
-import routing_task.service.ConnectionService;
+import routing_task.entity.DbConnection;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 @Component
-//@DependsOn("connectionService")
-public class DataSourceRouting extends AbstractRoutingDataSource {
-    private final DataSourceContextHolder dataSourceContextHolder;
-    private final ApplicationContext applicationContext;
+public class DataSourceRouting extends AbstractDataSource {
 
-    public DataSourceRouting(DataSourceContextHolder dataSourceContextHolder, ConnectionService connectionService, ApplicationContext applicationContext) {
-        this.dataSourceContextHolder = dataSourceContextHolder;
-        this.applicationContext = applicationContext;
-        this.setDefaultTargetDataSource(applicationContext.getBean("primaryDatabase"));
-        Map<Object,Object> nextDBConnectionMap = new HashMap<>();
-        //nextDbConnectionRepository.findAll().forEach(e->nextDBConnectionMap.put(e.getDataSourceEnum(),e));
-        this.setTargetDataSources(nextDBConnectionMap);
+    private DataSource resolvedDataSources = null;
+
+    private final DataSource resolvedDefaultDataSource;
+
+    public DataSourceRouting(DataSourceProperties dataSourceProps) {
+        resolvedDefaultDataSource = createDataSource(dataSourceProps.getUrl(), dataSourceProps.getUsername(), dataSourceProps.getPassword());
     }
 
     @Override
-    protected Object determineCurrentLookupKey() {
-        return dataSourceContextHolder.getBranchContext();
+    @SneakyThrows
+    public Connection getConnection() {
+        return resolvedDataSources != null ? resolvedDataSources.getConnection() : this.resolvedDefaultDataSource.getConnection();
     }
+
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException {
+        return resolvedDataSources != null ? resolvedDataSources.getConnection(username, password) : this.resolvedDefaultDataSource.getConnection(username, password);
+    }
+
+    public void addConnection(DbConnection dbConnections) {
+        resolvedDataSources = createDataSource(dbConnections.getUrl(), dbConnections.getUsername(), dbConnections.getPassword());
+    }
+
+    @SneakyThrows
+    public void closeConnection() {
+        this.resolvedDataSources.getConnection().close();
+        this.resolvedDataSources = null;
+    }
+
+    private DataSource createDataSource(String url, String username, String password) {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(url);
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
+        return new HikariDataSource(hikariConfig);
+    }
+
 }
+

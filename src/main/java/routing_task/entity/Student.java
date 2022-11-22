@@ -1,4 +1,4 @@
-package routing_task.targetEntities.model;
+package routing_task.entity;
 
 import lombok.*;
 
@@ -7,15 +7,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
+@Builder
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class StudentDbo {
+@NoArgsConstructor
+public class Student {
     @Id
     @GeneratedValue
     private Integer id;
-    private String name;
-    private Integer age;
+    private String firstname;
 }
