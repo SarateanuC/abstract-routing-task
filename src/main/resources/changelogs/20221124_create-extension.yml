@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      - id: 20221124_create-extension
+        author: carolina.sarateanu
+        failOnError: true
+        changes:
+      - sql:
+          dbms: 'postgresql'
+          splitStatements: false
+          sql: CREATE EXTENSION pgcrypto;
