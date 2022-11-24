@@ -18,16 +18,14 @@ public class DataSourceService {
     private final DataSourceRouting dataSourceRouting;
     private final StudentRepository studentRepository;
 
-    @Scheduled(fixedDelayString = "PT1S")
+    @Scheduled(fixedDelayString = "PT50S")
     public void insertInto() {
-//        dataSourceRepostiory.findById("First").ifPresent(dataSourceRouting::addConnection);
-        for (DbConnection database : dataSourceRepostiory.findAll()) {
+        for (DbConnection database : dataSourceRepostiory.getConnections()) {
             dataSourceRouting.addConnection(database);
-            studentRepository.save(Student.builder().firstname("Test").build());
+            studentRepository.save(Student.builder().firstname("Cornel45").build());
             dataSourceRouting.closeConnection();
         }
-//        studentRepository.save(Student.builder().firstname("Radu").build());
-//        dataSourceRouting.closeConnection();
+
     }
 }
 

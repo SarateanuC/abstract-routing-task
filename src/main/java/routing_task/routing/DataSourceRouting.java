@@ -40,7 +40,7 @@ public class DataSourceRouting extends AbstractDataSource {
 
     @SneakyThrows
     public void closeConnection() {
-        this.resolvedDataSources.getConnection().close();
+        this.resolvedDataSources.unwrap(HikariDataSource.class).close();
         this.resolvedDataSources = null;
     }
 

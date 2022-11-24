@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      - id: 20221124_create-procedure
+        author: carolina.sarateanu
+        failOnError: true
+        changes:
+      - sql:
+          dbms: 'postgresql'
+          splitStatements: false
+          sql: CREATE OR REPLACE PROCEDURE insert_data(id varchar, url varchar, username varchar,
+            password varchar)
+            LANGUAGE sql
+            AS $procedure$
+            INSERT INTO dbconnections VALUES (id,url,username, PGP_SYM_ENCRYPT(password,'AES_KEY'));
+            $procedure$;

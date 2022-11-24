@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      - id: 20221124_create-procedure
+        author: carolina.sarateanu
+        failOnError: true
+        changes:
+      - sql:
+          dbms: 'postgresql'
+          splitStatements: false
+          sql: CREATE OR REPLACE FUNCTION decrypted()
+               RETURNS TABLE(id varchar, url varchar, username varchar, password varchar) 
+               AS $$
+               SELECT id,url,username,PGP_SYM_DECRYPT(password::bytea, 'AES_KEY') as password 
+               FROM dbconnections;
+               $$ LANGUAGE SQL;
