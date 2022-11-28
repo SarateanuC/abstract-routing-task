@@ -7,4 +7,4 @@ databaseChangeLog:
       - sql:
           dbms: 'postgresql'
           splitStatements: false
-          sql: CREATE TABLE dbconnections(id varchar, url varchar, username varchar, password varchar);
+          sql: CREATE TABLE IF NOT EXISTS dbconnections(id varchar, url varchar, username varchar, password varchar);

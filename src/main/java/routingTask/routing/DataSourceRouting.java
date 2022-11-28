@@ -1,4 +1,4 @@
-package routing_task.routing;
+package routingTask.routing;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -6,7 +6,7 @@ import lombok.SneakyThrows;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.stereotype.Component;
-import routing_task.entity.DbConnection;
+import routingTask.entity.DbConnection;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -14,7 +14,6 @@ import java.sql.SQLException;
 
 @Component
 public class DataSourceRouting extends AbstractDataSource {
-
     private DataSource resolvedDataSources = null;
 
     private final DataSource resolvedDefaultDataSource;

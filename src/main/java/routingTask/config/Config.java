@@ -1,11 +1,11 @@
-package routing_task.config;
+package routingTask.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import routing_task.routing.DataSourceRouting;
+import routingTask.routing.DataSourceRouting;
 
 @Configuration
 @RequiredArgsConstructor

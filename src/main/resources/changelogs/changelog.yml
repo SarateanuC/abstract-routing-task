@@ -11,6 +11,6 @@ databaseChangeLog:
   - include:
       - file: 20221124_create-procedure.yml
       - relativeToChangelogFile: true
-  - include:
-      - file: 20221124_insert-into-dbconnections.yml
-      - relativeToChangelogFile: true
+#  - include:
+#      - file: 20221124_insert-into-dbconnections.yml
+#      - relativeToChangelogFile: true

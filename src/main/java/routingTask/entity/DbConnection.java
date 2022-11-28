@@ -1,4 +1,4 @@
-package routing_task.entity;
+package routingTask.entity;
 
 import lombok.*;
 
