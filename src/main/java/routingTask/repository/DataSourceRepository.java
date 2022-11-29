@@ -16,6 +16,6 @@ public interface DataSourceRepository extends JpaRepository<DbConnection, String
 
     @Transactional
     @Modifying
-    @Query(value = " call insert_data(?1,?2,?3,?4)", nativeQuery = true)
+    @Query(value = "call insert_data(?1,?2,?3,?4)", nativeQuery = true)
     void addConnection(String id, String url, String username, String password);
 }

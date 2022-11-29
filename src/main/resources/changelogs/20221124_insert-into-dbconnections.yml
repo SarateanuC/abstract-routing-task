@@ -7,12 +7,12 @@ databaseChangeLog:
       - sql:
           dbms: 'postgresql'
           splitStatements: false
-          sql: CALL insert_data('ONE','jdbc:postgresql://localhost:5432/db1','postgres','postgres');
+          sql: CALL insert_data('MD','jdbc:postgresql://localhost:5432/db1','postgres','postgres');
       - sql:
           dbms: 'postgresql'
           splitStatements: false
-          sql: CALL insert_data('TWO','jdbc:postgresql://localhost:5432/db2','postgres','postgres');
+          sql: CALL insert_data('UK','jdbc:postgresql://localhost:5432/db2','postgres','postgres');
       - sql:
           dbms: 'postgresql'
           splitStatements: false
-          sql: CALL insert_data('THREE','jdbc:postgresql://localhost:5432/db3','postgres','postgres');
+          sql: CALL insert_data('RO','jdbc:postgresql://localhost:5432/db3','postgres','postgres');

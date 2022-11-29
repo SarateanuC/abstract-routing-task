@@ -2,17 +2,17 @@ package routingTask.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import routingTask.dto.UserAddRequestDto;
 import routingTask.entity.DbConnection;
-import routingTask.entity.Student;
 import routingTask.repository.DataSourceRepository;
-
-import routingTask.repository.StudentRepository;
+import routingTask.repository.UserRepository;
 import routingTask.requestDto.DboConnectionAddRequest;
 import routingTask.routing.DataSourceRouting;
 
 import java.util.List;
+
+import static routingTask.entity.User.builder;
 
 @Service
 @EnableScheduling
@@ -20,18 +20,29 @@ import java.util.List;
 public class DataSourceService {
     private final DataSourceRepository dataSourceRepository;
     private final DataSourceRouting dataSourceRouting;
-    private final StudentRepository studentRepository;
+    private final UserRepository userRepository;
 
-    @Scheduled(fixedDelayString = "PT50S")
-    public void insertStudent() {
+    //@Transactional(rollbackFor = {Exception.class, ConstraintViolationException.class}, propagation = Propagation.REQUIRED)
+    public void insertUser(List<UserAddRequestDto> userAddRequestDtos) {
         for (DbConnection database : dataSourceRepository.getConnections()) {
             dataSourceRouting.addConnection(database);
-            studentRepository.save(Student.builder().firstname("Cornel4").build());
+            userAddRequestDtos.stream().filter(
+                            user -> user.getNationality().matches(database.getId()))
+                    .map(user -> builder()
+                            .first_name(user.getFirst_name())
+                            .gender(user.getSex())
+                            .last_name(user.getLast_name())
+                            .password(user.getPassword())
+                            .birth_Date(user.getDate_of_birth())
+                            .user_name(user.getUser_name())
+                            .nationality(user.getNationality())
+                            .build())
+                    .forEach(userRepository::save);
             dataSourceRouting.closeConnection();
         }
     }
 
-    public void insertDataSource(DboConnectionAddRequest dbConnection){
+    public void insertDataSource(DboConnectionAddRequest dbConnection) {
         dataSourceRepository.addConnection(
                 dbConnection.getId(),
                 dbConnection.getUrl(),
@@ -40,13 +51,16 @@ public class DataSourceService {
         );
     }
 
-    public void removeDataSource(String source_id){
+    public void removeDataSource(String source_id) {
         dataSourceRepository.deleteById(source_id);
     }
 
-    public List<DbConnection> getAllDataSources(){
+    public List<DbConnection> getAllDataSources() {
         return dataSourceRepository.findAll();
     }
 
+//    public List<DbConnection> getDecrypted() {
+//        return dataSourceRepository.getConnections();
+//    }
 }
 
