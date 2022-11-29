@@ -7,6 +7,7 @@ import routingTask.entity.DbConnection;
 import routingTask.requestDto.DboConnectionAddRequest;
 import routingTask.service.DataSourceService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -31,7 +32,7 @@ public class RoutingController {
     }
 
     @PostMapping("/users")
-    public void addStudents(@RequestBody List<UserAddRequestDto> userAddRequestDtos) {
+    public void addStudents(@Valid @RequestBody List<UserAddRequestDto> userAddRequestDtos) {
         dataSourceService.insertUser(userAddRequestDtos);
     }
 

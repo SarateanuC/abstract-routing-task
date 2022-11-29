@@ -2,10 +2,7 @@ package routingTask.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -20,7 +17,8 @@ public class User {
     @GeneratedValue
     private Integer id;
     @NotBlank(message = "Firstname must not be blank")
-    private String first_name;
+    @Column(name = "first_name")
+    private String firstName;
     @NotBlank(message = "Lastname must not be blank")
     private String last_name;
     private String gender;
