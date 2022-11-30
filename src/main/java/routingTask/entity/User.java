@@ -20,13 +20,16 @@ public class User {
     @Column(name = "first_name")
     private String firstName;
     @NotBlank(message = "Lastname must not be blank")
+    @Column(name = "last_name")
     private String last_name;
     private String gender;
-    private String birth_Date;
+    @Column(name = "birth_date")
+    private String birthdate;
     @NotBlank(message = "Nationality must not be blank")
     private String nationality;
     @NotBlank(message = "Username must not be blank")
-    private String user_name;
+    @Column(name = "user_name")
+    private String userName;
     @NotBlank(message = "Password must not be blank")
     private String password;
 }
