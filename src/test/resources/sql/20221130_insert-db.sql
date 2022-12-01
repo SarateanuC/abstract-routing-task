@@ -1,3 +1,0 @@
-INSERT INTO database_connector.dbconnections VALUES ('RO','jdbc:postgresql://localhost:5432/db1','postgres', PGP_SYM_ENCRYPT('postgres','AES_KEY'));
-INSERT INTO database_connector.dbconnections VALUES ('MD','jdbc:postgresql://localhost:5432/db2','postgres', PGP_SYM_ENCRYPT('postgres','AES_KEY'));
-INSERT INTO database_connector.dbconnections VALUES ('UK','jdbc:postgresql://localhost:5432/db3','postgres', PGP_SYM_ENCRYPT('postgres','AES_KEY'));

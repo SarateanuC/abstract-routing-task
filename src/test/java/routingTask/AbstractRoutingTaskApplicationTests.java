@@ -7,35 +7,48 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import routingTask.dto.UserAddRequestDto;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-@SpringBootTest
-//@SqlGroup(
-//        @Sql(scripts = {"/sql/20221130_create-database.sql",
-//                "/sql/20221130_create-extension.sql",
-//                "/sql/20221130_create-table.sql",
-//                "/sql/20221130_create-user-table.sql",
-//                "/sql/20221130_insert-db.sql"
-//        }))
+//@ActiveProfiles("test")
+@Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class AbstractRoutingTaskApplicationTests {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Container
+    private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+            .withDatabaseName("database_connector");
+
+
+    @DynamicPropertySource
+    static void overrideTestProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", POSTGRES_SQL_CONTAINER::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES_SQL_CONTAINER::getUsername);
+        registry.add("spring.datasource.password", POSTGRES_SQL_CONTAINER::getPassword);
+        registry.add("spring.datasource.driver-class-name", POSTGRES_SQL_CONTAINER::getDriverClassName);
+
+    }
 
     @Test
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @SneakyThrows
     void testSuccessfulTransaction() {
         UserAddRequestDto userAddRequestDto1 = UserAddRequestDto.builder()
@@ -43,7 +56,7 @@ class AbstractRoutingTaskApplicationTests {
                 .birthdate("date1")
                 .nationality("MD")
                 .firstName("Smith")
-                .lastName("Kevin")
+                .lastName("Kevi")
                 .password("123")
                 .userName("kiwi")
                 .build();
@@ -64,7 +77,6 @@ class AbstractRoutingTaskApplicationTests {
     }
 
     @Test
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @SneakyThrows
     void testTransactionRollback() {
         UserAddRequestDto userAddRequestDto1 = UserAddRequestDto.builder()
@@ -90,8 +102,8 @@ class AbstractRoutingTaskApplicationTests {
         mockMvc.perform(post("http://localhost:8082/api/user/add")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(list)))
-                .andExpect(status().isInternalServerError());
-        //.andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException));
+                .andExpect(status().isInternalServerError())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException));
 
     }
 
