@@ -10,7 +10,6 @@ import routingTask.requestDto.DboConnectionAddRequest;
 import java.util.List;
 
 @Service
-@EnableScheduling
 @RequiredArgsConstructor
 public class DataSourceService {
     private final DataSourceRepository dataSourceRepository;
