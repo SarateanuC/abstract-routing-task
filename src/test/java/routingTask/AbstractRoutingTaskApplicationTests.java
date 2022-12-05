@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -18,6 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import routingTask.dto.UserAddRequestDto;
 import routingTask.entity.User;
+import routingTask.repository.DataSourceRepository;
 import routingTask.repository.UserRepository;
 
 import javax.validation.ConstraintViolationException;
@@ -26,11 +29,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+@SqlGroup(
+        @Sql(scripts = {"/sql/init-primary-db.sql",
+              // "/sql/init-db.sql"
+        }))
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 @Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 class AbstractRoutingTaskApplicationTests {
     @Autowired
     private MockMvc mockMvc;
@@ -38,14 +44,17 @@ class AbstractRoutingTaskApplicationTests {
     private ObjectMapper objectMapper;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private DataSourceRepository dataSourceRepository;
     @Container
     private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER =
-            new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
-                    .withDatabaseName("database_connector")
+            new PostgreSQLContainer<>(DockerImageName.parse("postgres:13-alpine"))
+                    .withDatabaseName("database_connector_test")
                     .withUsername("postgres")
-                    .withPassword("root")
-                    .withExposedPorts(3030)
+                    .withPassword("postgres")
                     .withReuse(true);
+                    //.withInitScript("sql/init-db.sql")
+
 
     @DynamicPropertySource
     static void overrideTestProperties(DynamicPropertyRegistry registry) {
@@ -61,6 +70,16 @@ class AbstractRoutingTaskApplicationTests {
         POSTGRES_SQL_CONTAINER.start();
     }
 
+    @Test
+    void test(){
+        userRepository.save(User.builder().userName("user").last_name("l")
+                        .password("p")
+                        .nationality("K")
+                        .firstName("f")
+                .build());
+        System.out.println(userRepository.findAll().size());
+        System.out.println(dataSourceRepository.findAll().size());
+    }
     @Test
     @SneakyThrows
     void testSuccessfulTransaction() {
@@ -118,7 +137,6 @@ class AbstractRoutingTaskApplicationTests {
                         .content(objectMapper.writeValueAsString(list)))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException));
-
     }
 
     @Test
@@ -136,7 +154,7 @@ class AbstractRoutingTaskApplicationTests {
         mockMvc.perform(post("http://localhost:8082/api/user/add")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(List.of(userAddRequestDto))))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isOk());
     }
 
 }
