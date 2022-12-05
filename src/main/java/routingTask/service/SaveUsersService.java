@@ -25,7 +25,7 @@ public class SaveUsersService {
                 .map(user -> User.builder()
                         .firstName(user.getFirstName())
                         .gender(user.getGender())
-                        .last_name(user.getLastName())
+                        .lastName(user.getLastName())
                         .password(user.getPassword())
                         .birthdate(user.getBirthdate())
                         .userName(user.getUserName())

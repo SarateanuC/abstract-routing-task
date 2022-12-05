@@ -21,7 +21,7 @@ public class User {
     private String firstName;
     @NotBlank(message = "Lastname must not be blank")
     @Column(name = "last_name")
-    private String last_name;
+    private String lastName;
     private String gender;
     @Column(name = "birth_date")
     private String birthdate;

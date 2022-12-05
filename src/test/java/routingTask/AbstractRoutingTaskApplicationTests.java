@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -29,10 +29,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-@SqlGroup(
-        @Sql(scripts = {"/sql/init-primary-db.sql",
-              // "/sql/init-db.sql"
-        }))
+
+//@Sql(scripts = {"/sql/init-primary-db.sql",
+//        "/sql/init-db.sql"
+//})
+@Sql(scripts = {"/sql/init-primary-db.sql",
+        "/sql/init-db.sql"},
+        config = @SqlConfig(encoding = "utf-8", transactionMode = SqlConfig.TransactionMode.ISOLATED))
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 @Testcontainers
@@ -52,8 +55,8 @@ class AbstractRoutingTaskApplicationTests {
                     .withDatabaseName("database_connector_test")
                     .withUsername("postgres")
                     .withPassword("postgres")
+                    .withExposedPorts(5432, 60250)
                     .withReuse(true);
-                    //.withInitScript("sql/init-db.sql")
 
 
     @DynamicPropertySource
@@ -71,15 +74,16 @@ class AbstractRoutingTaskApplicationTests {
     }
 
     @Test
-    void test(){
-        userRepository.save(User.builder().userName("user").last_name("l")
-                        .password("p")
-                        .nationality("K")
-                        .firstName("f")
+    void test() {
+        userRepository.save(User.builder().userName("user").lastName("l")
+                .password("p")
+                .nationality("K")
+                .firstName("f")
                 .build());
         System.out.println(userRepository.findAll().size());
         System.out.println(dataSourceRepository.findAll().size());
     }
+
     @Test
     @SneakyThrows
     void testSuccessfulTransaction() {
