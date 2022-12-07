@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;
 import routingTask.dto.UserAddRequestDto;
+import routingTask.exception.NoSuchCountryException;
 import routingTask.repository.DataSourceRepository;
 
 import java.util.List;
@@ -23,6 +24,9 @@ public class UserService {
                 .collect(toList());
 
         val connectionsByCountries = dataSourceRepository.findConnectionsByCountries(countries);
+        if (connectionsByCountries.isEmpty()) {
+            throw new NoSuchCountryException();
+        }
         connectionsByCountries.forEach(c -> service.saveUser(c, userAddRequestDtos));
     }
 }

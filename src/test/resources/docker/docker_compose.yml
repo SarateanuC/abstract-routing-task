@@ -1,0 +1,10 @@
+services:
+  db:
+    image: postgres:13-alpine
+    restart: always
+    ports:
+      - 60250:5432
+    env_file:
+      - .env
+    volumes:
+      - ./docker-multiple-databases-init.sh:/docker-entrypoint-initdb.d/docker-multiple-databases-init.sh

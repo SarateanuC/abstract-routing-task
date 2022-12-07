@@ -7,4 +7,4 @@ databaseChangeLog:
       - sql:
           dbms: 'postgresql'
           splitStatements: false
-          sql: CREATE EXTENSION pgcrypto;
+          sql: CREATE EXTENSION IF NOT EXISTS pgcrypto;
