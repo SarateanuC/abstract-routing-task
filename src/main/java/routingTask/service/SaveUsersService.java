@@ -3,6 +3,7 @@ package routingTask.service;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import routingTask.dto.UserAddRequestDto;
 import routingTask.entity.DbConnection;
@@ -19,7 +20,7 @@ public class SaveUsersService {
     private final DataSourceRouting dataSourceRouting;
     private final UserRepository userRepository;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected void saveUser(DbConnection connection, List<UserAddRequestDto> userAddRequestDtos) {
         val collect = userAddRequestDtos.stream()
                 .map(user -> User.builder()

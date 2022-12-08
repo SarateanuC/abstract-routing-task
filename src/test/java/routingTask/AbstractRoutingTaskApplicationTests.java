@@ -32,9 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql(scripts = {"/sql/init-primary-db.sql",
 //        "/sql/init-db.sql"
 })
-//@Sql(scripts = {"/sql/init-primary-db.sql",
-//        "/sql/init-db.sql"},
-//        config = @SqlConfig(encoding = "utf-8", transactionMode = SqlConfig.TransactionMode.ISOLATED))
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 @Testcontainers

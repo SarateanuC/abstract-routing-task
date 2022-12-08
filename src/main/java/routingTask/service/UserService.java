@@ -15,18 +15,17 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class UserService {
     private final DataSourceRepository dataSourceRepository;
-    private final SaveUsersService service;
+    private final SaveUsersService saveUsersService;
 
     public void insertUser(List<UserAddRequestDto> userAddRequestDtos) {
         val countries = userAddRequestDtos.stream()
                 .map(UserAddRequestDto::getNationality)
                 .distinct()
                 .collect(toList());
-
         val connectionsByCountries = dataSourceRepository.findConnectionsByCountries(countries);
         if (connectionsByCountries.isEmpty()) {
             throw new NoSuchCountryException();
         }
-        connectionsByCountries.forEach(c -> service.saveUser(c, userAddRequestDtos));
+        connectionsByCountries.forEach(c -> saveUsersService.saveUser(c, userAddRequestDtos));
     }
 }
