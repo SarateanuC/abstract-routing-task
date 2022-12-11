@@ -13,6 +13,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -45,6 +46,9 @@ class AbstractRoutingTaskApplicationTests {
     private UserRepository userRepository;
     @Autowired
     private DataSourceRepository dataSourceRepository;
+
+    private static final String PATH_TO_FILE = "classpath:docker";
+
     @Container
     private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER =
             new PostgreSQLContainer<>(DockerImageName.parse("postgres:13-alpine"))
@@ -52,11 +56,13 @@ class AbstractRoutingTaskApplicationTests {
                     .withUsername("postgres")
                     .withPassword("postgres")
                     .withExposedPorts(5432, 60250)
+                    .withInitScript("sql/createdb.sql")
                     .withReuse(true);
 
 
     @DynamicPropertySource
     static void overrideTestProperties(DynamicPropertyRegistry registry) {
+        Integer firstMappedPort = POSTGRES_SQL_CONTAINER.getMappedPort(5432);
         registry.add("spring.datasource.url", POSTGRES_SQL_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES_SQL_CONTAINER::getUsername);
         registry.add("spring.datasource.password", POSTGRES_SQL_CONTAINER::getPassword);
@@ -97,6 +103,7 @@ class AbstractRoutingTaskApplicationTests {
                 .userName("BILLborded89")
                 .build();
         List<UserAddRequestDto> list = List.of(userAddRequestDto1, userAddRequestDto2);
+        System.out.println("");
         mockMvc.perform(post("http://localhost:8082/api/user/add")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(list)))
