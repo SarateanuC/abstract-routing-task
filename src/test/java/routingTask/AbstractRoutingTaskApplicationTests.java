@@ -30,9 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql(scripts = {"/sql/init-primary-db.sql",
-//        "/sql/init-db.sql"
-})
+@Sql(scripts = {"/sql/init-primary-db.sql"})
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 @Testcontainers
@@ -47,7 +45,7 @@ class AbstractRoutingTaskApplicationTests {
     @Autowired
     private DataSourceRepository dataSourceRepository;
 
-    private static final String PATH_TO_FILE = "classpath:docker";
+    //private static final String PATH_TO_FILE = "classpath:docker";
 
     @Container
     private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER =
@@ -62,7 +60,7 @@ class AbstractRoutingTaskApplicationTests {
 
     @DynamicPropertySource
     static void overrideTestProperties(DynamicPropertyRegistry registry) {
-        Integer firstMappedPort = POSTGRES_SQL_CONTAINER.getMappedPort(5432);
+       // Integer firstMappedPort = POSTGRES_SQL_CONTAINER.getMappedPort(5432);
         registry.add("spring.datasource.url", POSTGRES_SQL_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES_SQL_CONTAINER::getUsername);
         registry.add("spring.datasource.password", POSTGRES_SQL_CONTAINER::getPassword);
@@ -73,11 +71,13 @@ class AbstractRoutingTaskApplicationTests {
     @BeforeAll
     public static void init() {
         POSTGRES_SQL_CONTAINER.start();
+
     }
 
     @Test
     void numberOfConnectionsTest() {
         assertThat(dataSourceRepository.findAll().size()).isEqualTo(2);
+        System.out.println(POSTGRES_SQL_CONTAINER.getMappedPort(5432));
     }
 
     @Test
@@ -102,8 +102,8 @@ class AbstractRoutingTaskApplicationTests {
                 .password("12")
                 .userName("BILLborded89")
                 .build();
+        System.out.println(POSTGRES_SQL_CONTAINER.getDatabaseName());
         List<UserAddRequestDto> list = List.of(userAddRequestDto1, userAddRequestDto2);
-        System.out.println("");
         mockMvc.perform(post("http://localhost:8082/api/user/add")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(list)))

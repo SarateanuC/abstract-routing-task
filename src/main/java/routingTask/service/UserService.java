@@ -33,19 +33,6 @@ public class UserService {
             throw new NoSuchCountryException();
         }
         connectionsByCountries.forEach(c -> saveUsersService.saveUser(c, userAddRequestDtos));
-        dataSourceRouting.closeConnection();
+        //dataSourceRouting.closeConnection();
     }
-
-//    @Transactional
-//    public void insertUser(List<UserAddRequestDto> userAddRequestDtos) {
-//        val countries = userAddRequestDtos.stream()
-//                .map(UserAddRequestDto::getNationality)
-//                .distinct()
-//                .collect(toList());
-//        val connectionsByCountries = dataSourceRepository.findConnectionsByCountries(countries);
-//        if (connectionsByCountries.isEmpty()) {
-//            throw new NoSuchCountryException();
-//        }
-//        connectionsByCountries.forEach(c -> saveUsersService.saveUser(c, userAddRequestDtos));
-//    }
 }

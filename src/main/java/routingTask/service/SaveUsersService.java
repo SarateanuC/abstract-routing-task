@@ -22,7 +22,7 @@ public class SaveUsersService {
     private final DataSourceRouting dataSourceRouting;
     private final UserRepository userRepository;
 
-    //    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    //@Transactional(propagation = Propagation.REQUIRES_NEW)
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
     public void saveUser(DbConnection connection, List<UserAddRequestDto> userAddRequestDtos) {
         dataSourceRouting.addConnection(connection);
@@ -38,31 +38,10 @@ public class SaveUsersService {
                         .nationality(user.getNationality())
                         .build())
                 .collect(Collectors.toList());
-        if (connection.getId().equals("RO")) {
-            throw new NoSuchElementException();
-        }
+//        if (connection.getId().equals("RO")) {
+//            throw new NoSuchElementException();
+//        }
         userRepository.saveAll(users);
         dataSourceRouting.closeConnection();
-    }
-
-
-    protected void saveUser2(DbConnection connection, List<UserAddRequestDto> userAddRequestDtos) {
-        val collect = userAddRequestDtos.stream()
-                .map(user -> User.builder()
-                        .firstName(user.getFirstName())
-                        .gender(user.getGender())
-                        .lastName(user.getLastName())
-                        .password(user.getPassword())
-                        .birthdate(user.getBirthdate())
-                        .userName(user.getUserName())
-                        .nationality(user.getNationality())
-                        .build()).collect(Collectors.groupingBy(User::getNationality));
-        collect.forEach((key, value) -> {
-            if (key.matches(connection.getId())) {
-                dataSourceRouting.addConnection(connection);
-                userRepository.saveAll(value);
-                dataSourceRouting.closeConnection();
-            }
-        });
     }
 }
