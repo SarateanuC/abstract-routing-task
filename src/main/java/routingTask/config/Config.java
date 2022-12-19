@@ -1,24 +1,21 @@
 package routingTask.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import routingTask.routing.DataSourceRouting;
 
+import javax.transaction.*;
+
 @Configuration
 @RequiredArgsConstructor
-//@EnableTransactionManagement
+@EnableTransactionManagement
 @DependsOn("dataSourceRouting")
-//@EnableJpaRepositories(basePackages = "routingTask", transactionManagerRef = "transcationManager", entityManagerFactoryRef = "entityManager")
 public class Config {
     private final DataSourceRouting dataSourceRouting;
 
@@ -28,14 +25,42 @@ public class Config {
         return dataSourceRouting;
     }
 
-//    @Bean(name = "entityManager")
-//    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(EntityManagerFactoryBuilder builder) {
-//        return builder.dataSource(dataSource()).build();
-//    }
-//
-//    @Bean(name = "transcationManager")
-//    public JpaTransactionManager transactionManager(
-//            @Autowired @Qualifier("entityManager") LocalContainerEntityManagerFactoryBean entityManagerFactoryBean) {
-//        return new JpaTransactionManager(entityManagerFactoryBean.getObject());
-//    }
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new JpaTransactionManager();
+    }
+
+    @Bean
+    public UserTransaction userTransaction() {
+        return new UserTransaction() {
+            @Override
+            public void begin() throws NotSupportedException, SystemException {
+
+            }
+
+            @Override
+            public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
+
+            }
+
+            @Override
+            public void rollback() throws IllegalStateException, SecurityException, SystemException {
+
+            }
+
+            @Override
+            public void setRollbackOnly() throws IllegalStateException, SystemException {
+            }
+
+            @Override
+            public int getStatus() throws SystemException {
+                return 0;
+            }
+
+            @Override
+            public void setTransactionTimeout(int i) throws SystemException {
+
+            }
+        };
+    }
 }

@@ -1,17 +1,20 @@
 package routingTask.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import routingTask.dto.UserAddRequestDto;
+import routingTask.entity.User;
 import routingTask.exception.NoSuchCountryException;
 import routingTask.repository.DataSourceRepository;
+import routingTask.repository.UserRepository;
 import routingTask.routing.DataSourceRouting;
 
+import javax.transaction.UserTransaction;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -19,10 +22,12 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class UserService {
     private final DataSourceRepository dataSourceRepository;
-    private final SaveUsersService saveUsersService;
+    //private final SaveUsersService saveUsersService;
+    private final UserTransaction userTransaction;
     private final DataSourceRouting dataSourceRouting;
+    private final UserRepository userRepository;
 
-//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+    @SneakyThrows
     public void insertUser(List<UserAddRequestDto> userAddRequestDtos) {
         val countries = userAddRequestDtos.stream()
                 .map(UserAddRequestDto::getNationality)
@@ -32,7 +37,34 @@ public class UserService {
         if (connectionsByCountries.isEmpty()) {
             throw new NoSuchCountryException();
         }
-        connectionsByCountries.forEach(c -> saveUsersService.saveUser(c, userAddRequestDtos));
-        //dataSourceRouting.closeConnection();
+        dataSourceRouting.createConnections(connectionsByCountries);
+        if (connectionsByCountries.isEmpty()) {
+            throw new NoSuchCountryException();
+        }
+        Map<String, List<User>> collect = userAddRequestDtos.stream()
+                .map(user -> User.builder()
+                        .firstName(user.getFirstName())
+                        .gender(user.getGender())
+                        .lastName(user.getLastName())
+                        .password(user.getPassword())
+                        .birthdate(user.getBirthdate())
+                        .userName(user.getUserName())
+                        .nationality(user.getNationality())
+                        .build()).collect(Collectors.groupingBy(User::getNationality));
+        try {
+            userTransaction.begin();
+            collect.forEach(this::addListOfUsersToDb);
+        } catch (Exception e) {
+            userTransaction.setRollbackOnly();
+        }
+        dataSourceRouting.closeConnection();
     }
-}
+
+        private void addListOfUsersToDb (String dbId, List < User > usersToBeAdded){
+            dataSourceRouting.setCountry(dbId);
+            userRepository.saveAll(usersToBeAdded);
+        }
+    }
+
+
+
