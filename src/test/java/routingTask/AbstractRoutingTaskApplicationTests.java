@@ -13,7 +13,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -22,7 +21,7 @@ import routingTask.dto.UserAddRequestDto;
 import routingTask.repository.DataSourceRepository;
 import routingTask.repository.UserRepository;
 
-import javax.validation.ConstraintViolationException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +44,6 @@ class AbstractRoutingTaskApplicationTests {
     @Autowired
     private DataSourceRepository dataSourceRepository;
 
-    //private static final String PATH_TO_FILE = "classpath:docker";
 
     @Container
     private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER =
@@ -53,14 +51,12 @@ class AbstractRoutingTaskApplicationTests {
                     .withDatabaseName("database_connector_test")
                     .withUsername("postgres")
                     .withPassword("postgres")
-                    .withExposedPorts(5432, 60250)
                     .withInitScript("sql/createdb.sql")
                     .withReuse(true);
 
 
     @DynamicPropertySource
     static void overrideTestProperties(DynamicPropertyRegistry registry) {
-       // Integer firstMappedPort = POSTGRES_SQL_CONTAINER.getMappedPort(5432);
         registry.add("spring.datasource.url", POSTGRES_SQL_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES_SQL_CONTAINER::getUsername);
         registry.add("spring.datasource.password", POSTGRES_SQL_CONTAINER::getPassword);
@@ -70,14 +66,13 @@ class AbstractRoutingTaskApplicationTests {
 
     @BeforeAll
     public static void init() {
+        POSTGRES_SQL_CONTAINER.setPortBindings(Collections.singletonList("60250:5432"));
         POSTGRES_SQL_CONTAINER.start();
-
     }
 
     @Test
     void numberOfConnectionsTest() {
         assertThat(dataSourceRepository.findAll().size()).isEqualTo(2);
-        System.out.println(POSTGRES_SQL_CONTAINER.getMappedPort(5432));
     }
 
     @Test
@@ -136,8 +131,7 @@ class AbstractRoutingTaskApplicationTests {
         mockMvc.perform(post("http://localhost:8082/api/user/add")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(list)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -157,5 +151,4 @@ class AbstractRoutingTaskApplicationTests {
                         .content(objectMapper.writeValueAsString(List.of(userAddRequestDto))))
                 .andExpect(status().isBadRequest());
     }
-
 }

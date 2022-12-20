@@ -10,8 +10,8 @@ import routingTask.exception.NoSuchCountryException;
 import routingTask.repository.DataSourceRepository;
 import routingTask.repository.UserRepository;
 import routingTask.routing.DataSourceRouting;
+import routingTask.transaction.UserTransactionImpl;
 
-import javax.transaction.UserTransaction;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,8 +22,7 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class UserService {
     private final DataSourceRepository dataSourceRepository;
-    //private final SaveUsersService saveUsersService;
-    private final UserTransaction userTransaction;
+    private final UserTransactionImpl userTransaction;
     private final DataSourceRouting dataSourceRouting;
     private final UserRepository userRepository;
 
@@ -38,9 +37,6 @@ public class UserService {
             throw new NoSuchCountryException();
         }
         dataSourceRouting.createConnections(connectionsByCountries);
-        if (connectionsByCountries.isEmpty()) {
-            throw new NoSuchCountryException();
-        }
         Map<String, List<User>> collect = userAddRequestDtos.stream()
                 .map(user -> User.builder()
                         .firstName(user.getFirstName())
@@ -60,11 +56,11 @@ public class UserService {
         dataSourceRouting.closeConnection();
     }
 
-        private void addListOfUsersToDb (String dbId, List < User > usersToBeAdded){
-            dataSourceRouting.setCountry(dbId);
-            userRepository.saveAll(usersToBeAdded);
-        }
+    private void addListOfUsersToDb(String dbId, List<User> usersToBeAdded) {
+        dataSourceRouting.setCountry(dbId);
+        userRepository.saveAll(usersToBeAdded);
     }
+}
 
 
 

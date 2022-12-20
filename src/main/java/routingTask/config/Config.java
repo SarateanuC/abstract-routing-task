@@ -1,16 +1,24 @@
 package routingTask.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.jta.JtaTransactionManager;
 import routingTask.routing.DataSourceRouting;
 
-import javax.transaction.*;
+;import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
+
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,43 +32,8 @@ public class Config {
     public DataSourceRouting dataSource() {
         return dataSourceRouting;
     }
-
     @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new JpaTransactionManager();
-    }
-
-    @Bean
-    public UserTransaction userTransaction() {
-        return new UserTransaction() {
-            @Override
-            public void begin() throws NotSupportedException, SystemException {
-
-            }
-
-            @Override
-            public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-
-            }
-
-            @Override
-            public void rollback() throws IllegalStateException, SecurityException, SystemException {
-
-            }
-
-            @Override
-            public void setRollbackOnly() throws IllegalStateException, SystemException {
-            }
-
-            @Override
-            public int getStatus() throws SystemException {
-                return 0;
-            }
-
-            @Override
-            public void setTransactionTimeout(int i) throws SystemException {
-
-            }
-        };
+    public PlatformTransactionManager txManager() {
+        return new DataSourceTransactionManager(dataSource());
     }
 }
