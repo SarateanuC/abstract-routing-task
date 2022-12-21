@@ -1,5 +1,6 @@
 package routingTask.service;
 
+import com.atomikos.icatch.jta.UserTransactionImp;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -10,19 +11,18 @@ import routingTask.exception.NoSuchCountryException;
 import routingTask.repository.DataSourceRepository;
 import routingTask.repository.UserRepository;
 import routingTask.routing.DataSourceRouting;
-import routingTask.transaction.UserTransactionImpl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final DataSourceRepository dataSourceRepository;
-    private final UserTransactionImpl userTransaction;
+    private final UserTransactionImp userTransaction;
     private final DataSourceRouting dataSourceRouting;
     private final UserRepository userRepository;
 
@@ -46,14 +46,19 @@ public class UserService {
                         .birthdate(user.getBirthdate())
                         .userName(user.getUserName())
                         .nationality(user.getNationality())
-                        .build()).collect(Collectors.groupingBy(User::getNationality));
+                        .build()).collect(groupingBy(User::getNationality));
+
         try {
             userTransaction.begin();
             collect.forEach(this::addListOfUsersToDb);
+            userTransaction.commit();
         } catch (Exception e) {
             userTransaction.setRollbackOnly();
+            throw e;
+        } finally {
+            dataSourceRouting.closeConnection();
         }
-        dataSourceRouting.closeConnection();
+
     }
 
     private void addListOfUsersToDb(String dbId, List<User> usersToBeAdded) {
