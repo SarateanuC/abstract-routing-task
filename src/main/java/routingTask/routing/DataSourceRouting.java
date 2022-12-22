@@ -1,11 +1,9 @@
 package routingTask.routing;
 
-import com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.jta.atomikos.AtomikosDataSourceBean;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.stereotype.Component;
 import routingTask.entity.DbConnection;
@@ -91,7 +89,7 @@ public class DataSourceRouting extends AbstractDataSource {
 
     private DataSource createDataSource(String url, String username, String password) {
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setAutoCommit(false);
+       // hikariConfig.setAutoCommit(false);
         hikariConfig.setJdbcUrl(url);
         hikariConfig.setUsername(username);
         hikariConfig.setPassword(password);
