@@ -4,14 +4,11 @@ import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import routingTask.routing.DataSourceRouting;
@@ -40,12 +37,6 @@ public class Config {
         userTransactionManager.setForceShutdown(true);
         return userTransactionManager;
     }
-
-//    @Bean(name = "entityManager")
-//    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(EntityManagerFactoryBuilder builder) {
-//        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-//        return builder.dataSource(dataSource()).packages("routingTask").build();
-//    }
 
     @Bean
     public JtaTransactionManager transactionManager() throws SystemException {

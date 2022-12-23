@@ -89,7 +89,6 @@ public class DataSourceRouting extends AbstractDataSource {
 
     private DataSource createDataSource(String url, String username, String password) {
         HikariConfig hikariConfig = new HikariConfig();
-       // hikariConfig.setAutoCommit(false);
         hikariConfig.setJdbcUrl(url);
         hikariConfig.setUsername(username);
         hikariConfig.setPassword(password);
