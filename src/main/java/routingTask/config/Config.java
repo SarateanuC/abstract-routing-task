@@ -3,6 +3,7 @@ package routingTask.config;
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +15,8 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 import routingTask.routing.DataSourceRouting;
 
 import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
-@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @EnableTransactionManagement
@@ -39,14 +40,6 @@ public class Config {
     }
 
     @Bean
-    public JtaTransactionManager transactionManager() throws SystemException {
-        JtaTransactionManager jtaTransactionManager = new JtaTransactionManager();
-        jtaTransactionManager.setTransactionManager(userTransactionManager());
-        jtaTransactionManager.setUserTransaction(userTransactionImp());
-        return jtaTransactionManager;
-    }
-
-    @Bean
     public UserTransactionImp userTransactionImp() {
         UserTransactionImp userTransactionImp = new UserTransactionImp();
         try {
@@ -56,5 +49,16 @@ public class Config {
         }
         return userTransactionImp;
     }
+
+
+    @Bean
+    @DependsOn({"userTransactionImp","userTransactionManager"})
+    public JtaTransactionManager transactionManager() throws SystemException {
+        JtaTransactionManager jtaTransactionManager = new JtaTransactionManager();
+        jtaTransactionManager.setTransactionManager(userTransactionManager());
+        jtaTransactionManager.setUserTransaction(userTransactionManager());
+        return jtaTransactionManager;
+    }
+
 
 }
