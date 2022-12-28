@@ -1,7 +1,6 @@
 package routingTask.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
 import routingTask.entity.DbConnection;
 import routingTask.repository.DataSourceRepository;
@@ -28,7 +27,7 @@ public class DataSourceService {
     }
 
     public List<DbConnection> getAllDataSources() {
-        return dataSourceRepository.findAll();
+        return (List<DbConnection>) dataSourceRepository.findAll();
     }
 }
 

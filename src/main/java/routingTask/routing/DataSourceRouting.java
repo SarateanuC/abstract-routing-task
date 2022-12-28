@@ -1,7 +1,5 @@
 package routingTask.routing;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jta.atomikos.AtomikosDataSourceBean;
@@ -21,14 +19,8 @@ public class DataSourceRouting extends AbstractDataSource {
     private final DataSource resolvedDefaultDataSource;
 
     public DataSourceRouting(DataSourceProperties dataSourceProps) {
-//        resolvedDefaultDataSource = createDataSource(
-//                dataSourceProps.getName(),
-//                dataSourceProps.getUrl(),
-//                dataSourceProps.getUsername(),
-//                dataSourceProps.getPassword()
-//        );
-        resolvedDefaultDataSource = createDataSource(dataSourceProps.getName(),dataSourceProps.getUrl(),
-                dataSourceProps.determineUsername(),dataSourceProps.getPassword());
+        resolvedDefaultDataSource = createDataSource(dataSourceProps.getName(), dataSourceProps.getUrl(),
+                dataSourceProps.determineUsername(), dataSourceProps.getPassword());
     }
 
     @Override
@@ -44,25 +36,18 @@ public class DataSourceRouting extends AbstractDataSource {
 
 
     public void addConnection(DbConnection db) {
-        resolvedDataSources = createDataSource(db.getId(),db.getUrl(), db.getUsername(), db.getPassword());
+        resolvedDataSources = createDataSource(db.getId(), db.getUrl(), db.getUsername(), db.getPassword());
     }
 
     @SneakyThrows
     public void closeConnection() {
         resolvedDataSources.getConnection().close();
-        //resolvedDataSources.unwrap(HikariDataSource.class).close();
     }
 
     private DataSource createDataSource(String id, String url, String username, String password) {
-//        HikariConfig hikariConfig = new HikariConfig();
-//        hikariConfig.setAutoCommit(false);
-//        hikariConfig.setJdbcUrl(url);
-//        hikariConfig.setUsername(username);
-//        hikariConfig.setPassword(password);
-//        HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
         AtomikosDataSourceBean atomikosDataSourceBean = new AtomikosDataSourceBean();
         atomikosDataSourceBean.setUniqueResourceName(id);
-       atomikosDataSourceBean.setXaDataSourceClassName("org.postgresql.xa.PGXADataSource");
+        atomikosDataSourceBean.setXaDataSourceClassName("org.postgresql.xa.PGXADataSource");
         Properties p = new Properties();
         p.setProperty("user", username);
         p.setProperty("serverName", "localhost");

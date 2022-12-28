@@ -1,13 +1,12 @@
 package routingTask.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
-@Entity
+
 @Table(name = "dbconnections")
 @Getter
 @Setter

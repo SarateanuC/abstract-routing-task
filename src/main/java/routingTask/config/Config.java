@@ -3,25 +3,24 @@ package routingTask.config;
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import routingTask.routing.DataSourceRouting;
 
 import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableTransactionManagement
 @DependsOn("dataSourceRouting")
-@EnableJpaRepositories(basePackages = "routingTask")
+@EnableJdbcRepositories(basePackages = "routingTask")
 public class Config {
     private final DataSourceRouting dataSourceRouting;
 
@@ -29,6 +28,11 @@ public class Config {
     @Primary
     public DataSourceRouting dataSource() {
         return dataSourceRouting;
+    }
+
+    @Bean
+    public NamedParameterJdbcOperations operations() {
+        return new NamedParameterJdbcTemplate(dataSource());
     }
 
     @Bean(initMethod = "init", destroyMethod = "close")
@@ -52,13 +56,12 @@ public class Config {
 
 
     @Bean
-    @DependsOn({"userTransactionImp","userTransactionManager"})
+    @DependsOn({"userTransactionImp", "userTransactionManager"})
     public JtaTransactionManager transactionManager() throws SystemException {
         JtaTransactionManager jtaTransactionManager = new JtaTransactionManager();
         jtaTransactionManager.setTransactionManager(userTransactionManager());
         jtaTransactionManager.setUserTransaction(userTransactionManager());
         return jtaTransactionManager;
     }
-
 
 }
